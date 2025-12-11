@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 import ffmpeg
 import logging
 
@@ -19,5 +18,6 @@ def strip_audio(input_path: Path, output_path: Path) -> bool:
          .run(quiet=True, overwrite_output=True))
         return True
     except ffmpeg.Error as e:
-        logger.error(f'FFmpeg threw an error: {e.stderr.decode()}')
+        stderr = e.stderr.decode()[:500]
+        logger.error(f'FFmpeg threw an error: {stderr} when processing {input_path}')
         return False
