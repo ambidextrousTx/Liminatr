@@ -27,7 +27,6 @@ def process(input_path: Path, output_path: Path) -> tuple[int, int]:
         relative_path = mp4_file.relative_to(input_path)
         output_file_path = output_path / relative_path
         output_file_path.parent.mkdir(parents=True, exist_ok=True)
-        print(output_file_path)
         if strip_audio(mp4_file, output_file_path):
             successful += 1
         else:
