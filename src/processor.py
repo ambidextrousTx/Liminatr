@@ -14,7 +14,7 @@ def strip_audio(input_path: Path, output_path: Path) -> bool:
     """
     try:
         (ffmpeg.input(input_path)
-         .output(output_path.name, vcodec='copy', an=None)
+         .output(str(output_path), vcodec='copy', an=None)
          .run(quiet=True, overwrite_output=True))
         return True
     except ffmpeg.Error as e:
