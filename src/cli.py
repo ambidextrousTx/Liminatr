@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 from utils import validate_folder
 from processor import strip_audio
@@ -37,3 +38,14 @@ def process(input_path: Path, output_path: Path) -> tuple[int, int]:
         logger.info(f'Successfully processed all {successful} files!')
 
     return successful, failed
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Strip out audio from video files in a folder')
+    parser.add_argument('source', type=str, help='the source folder')
+    parser.add_argument('destination', type=str, help='the destination folder')
+    # parser.add_argument('--verbose', '-v', action='store_true', help='increase output verbosity')
+    args = parser.parse_args()
+    successful, failed = process(Path(args.source), Path(args.destination))
+
