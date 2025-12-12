@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def process(input_path: Path, output_path: Path, max_size_mb: int, dry_run: bool = False) -> tuple[int, int]:
+def process(input_path: Path, output_path: Path, max_size_mb: int = 1000, dry_run: bool = False) -> tuple[int, int]:
     successful = 0
     failed = 0
 
@@ -25,7 +25,7 @@ def process(input_path: Path, output_path: Path, max_size_mb: int, dry_run: bool
 
     logger.info(f'Found {len(mp4_files)} files within the max size of {max_size_mb} MB')
 
-    if args.dry_run:
+    if dry_run:
         logger.info(f'Would process {len(mp4_files)} files')
         for f in mp4_files:
             logger.info(f'  - {f}')
@@ -57,8 +57,5 @@ if __name__ == '__main__':
     parser.add_argument('--dry-run', '-d', action='store_true', help='show files to be processed without processing them')
     parser.add_argument('--max-size-mb', '-m', type=int, default=1000, help='maximum file size to process (in MB)')
     args = parser.parse_args()
-    max_size_mb = args.max_size_mb
-    verbose = args.verbose
-    dry_run = args.dry_run
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
-    successful, failed = process(Path(args.source), Path(args.destination), max_size_mb, dry_run)
+    successful, failed = process(Path(args.source), Path(args.destination), args.max_size_mb, args.dry_run)
