@@ -16,9 +16,7 @@ def process(input_path: Path, output_path: Path, max_size_mb: int = 1000, dry_ru
         return successful, failed
 
     max_size_bytes = max_size_mb * 1024 * 1024
-    mp4_files = [f for f in input_path.rglob('*') if f.is_file()
-                 and f.suffix.lower() == '.mp4'
-                 and f.stat().st_size <= max_size_bytes]
+    mp4_files = filter_small_mp4s(input_path, max_size_bytes)
     if not mp4_files:
         logger.error(f'No valid MP4 files found in {input_path}')
         return successful, failed
