@@ -9,7 +9,9 @@ logger = logging.getLogger(__name__)
 DEFAULT_MAX_SIZE_MB = 1000
 
 
-def process(input_path: Path, output_path: Path, max_size_mb: int = DEFAULT_MAX_SIZE_MB, dry_run: bool = False) -> tuple[int, int]:
+def process(input_path: Path, output_path: Path,
+            max_size_mb: int = DEFAULT_MAX_SIZE_MB, dry_run: bool = False)\
+        -> tuple[int, int]:
     successful = 0
     failed = 0
 
@@ -23,7 +25,8 @@ def process(input_path: Path, output_path: Path, max_size_mb: int = DEFAULT_MAX_
         logger.error(f'No valid MP4 files found in {input_path}')
         return successful, failed
 
-    logger.info(f'Found {len(mp4_files)} files within the max size of {max_size_mb} MB')
+    logger.info(f'Found {len(mp4_files)} files within the max size of '
+                f'{max_size_mb} MB')
 
     if dry_run:
         logger.info(f'Would process {len(mp4_files)} files')
@@ -41,7 +44,8 @@ def process(input_path: Path, output_path: Path, max_size_mb: int = DEFAULT_MAX_
             failed += 1
 
     if failed > 0:
-        logger.warning(f'Successfully processed {successful}/{len(mp4_files)} files. {failed} failed.')
+        logger.warning(f'Successfully processed {successful}/{len(mp4_files)}'
+                       f' files. {failed} failed.')
     else:
         logger.info(f'Successfully processed all {successful} files!')
 
@@ -53,9 +57,14 @@ if __name__ == '__main__':
         description='Strip out audio from video files in a folder')
     parser.add_argument('source', type=str, help='the source folder')
     parser.add_argument('destination', type=str, help='the destination folder')
-    parser.add_argument('--verbose', '-v', action='store_true', help='increase output verbosity')
-    parser.add_argument('--dry-run', '-d', action='store_true', help='show files to be processed without processing them')
-    parser.add_argument('--max-size-mb', '-m', type=int, default=DEFAULT_MAX_SIZE_MB, help='maximum file size to process (in MB)')
+    parser.add_argument('--verbose', '-v', action='store_true',
+                        help='increase output verbosity')
+    parser.add_argument('--dry-run', '-d', action='store_true',
+                        help='show files to be processed without processing')
+    parser.add_argument('--max-size-mb', '-m', type=int,
+                        default=DEFAULT_MAX_SIZE_MB,
+                        help='maximum file size to process (in MB)')
     args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
-    successful, failed = process(Path(args.source), Path(args.destination), args.max_size_mb, args.dry_run)
+    successful, failed = process(Path(args.source), Path(args.destination),
+                                 args.max_size_mb, args.dry_run)

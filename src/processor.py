@@ -19,5 +19,5 @@ def strip_audio(input_path: Path, output_path: Path) -> bool:
         return True
     except ffmpeg.Error as e:
         stderr = e.stderr.decode()[:500]
-        logger.error(f'FFmpeg threw an error: {stderr} when processing {input_path}')
+        logger.error(f'FFmpeg error: {stderr} processing {input_path}')
         return False
