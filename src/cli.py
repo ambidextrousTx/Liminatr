@@ -1,13 +1,15 @@
 import argparse
 from pathlib import Path
-from utils import validate_folder
+from utils import validate_folder, filter_small_mp4s
 from processor import strip_audio
 import logging
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_MAX_SIZE_MB = 1000
 
-def process(input_path: Path, output_path: Path, max_size_mb: int = 1000, dry_run: bool = False) -> tuple[int, int]:
+
+def process(input_path: Path, output_path: Path, max_size_mb: int = DEFAULT_MAX_SIZE_MB, dry_run: bool = False) -> tuple[int, int]:
     successful = 0
     failed = 0
 
@@ -53,7 +55,7 @@ if __name__ == '__main__':
     parser.add_argument('destination', type=str, help='the destination folder')
     parser.add_argument('--verbose', '-v', action='store_true', help='increase output verbosity')
     parser.add_argument('--dry-run', '-d', action='store_true', help='show files to be processed without processing them')
-    parser.add_argument('--max-size-mb', '-m', type=int, default=1000, help='maximum file size to process (in MB)')
+    parser.add_argument('--max-size-mb', '-m', type=int, default=DEFAULT_MAX_SIZE_MB, help='maximum file size to process (in MB)')
     args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
     successful, failed = process(Path(args.source), Path(args.destination), args.max_size_mb, args.dry_run)
