@@ -1,7 +1,10 @@
 import argparse
+import os
 from pathlib import Path
 from utils import validate_folder, filter_small_mp4s
 from processor import strip_audio
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from tqdm import tqdm
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,7 +13,8 @@ DEFAULT_MAX_SIZE_MB = 1000
 
 
 def process(input_path: Path, output_path: Path,
-            max_size_mb: int = DEFAULT_MAX_SIZE_MB, dry_run: bool = False)\
+            max_size_mb: int = DEFAULT_MAX_SIZE_MB, dry_run: bool = False,
+            max_workers: int = None) \
         -> tuple[int, int]:
     successful = 0
     failed = 0
@@ -34,14 +38,32 @@ def process(input_path: Path, output_path: Path,
             logger.info(f'  - {f}')
         return 0, 0
 
+    if max_workers is None:
+        max_workers = os.cpu_count() - 1 or 1
+
+    # Pre-create all output directories before multiprocessing
     for mp4_file in mp4_files:
         relative_path = mp4_file.relative_to(input_path)
         output_file_path = output_path / relative_path
         output_file_path.parent.mkdir(parents=True, exist_ok=True)
-        if strip_audio(mp4_file, output_file_path):
-            successful += 1
-        else:
-            failed += 1
+
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        futures_to_file = {
+            executor.submit(strip_audio, mp4_file,
+                            output_path / mp4_file.relative_to(input_path)
+                            ): mp4_file for mp4_file in mp4_files
+        }
+
+        for future in tqdm(as_completed(futures_to_file), total=len(mp4_files),
+                           desc="Stripping audio"):
+            mp4_file = futures_to_file[future]
+            try:
+                if future.result():
+                    successful += 1
+                else:
+                    failed += 1
+            except Exception as e:
+                logger.error(f'Unexpected error processing {mp4_file}: {e}')
 
     if failed > 0:
         logger.warning(f'Successfully processed {successful}/{len(mp4_files)}'
