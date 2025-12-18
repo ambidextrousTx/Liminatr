@@ -14,8 +14,8 @@ DEFAULT_MAX_SIZE_MB = 1000
 
 def process(input_path: Path, output_path: Path,
             max_size_mb: int = DEFAULT_MAX_SIZE_MB, dry_run: bool = False,
-            max_workers: int = None) \
-        -> tuple[int, int]:
+            max_workers: int = None
+            ) -> tuple[int, int]:
     successful = 0
     failed = 0
 
@@ -63,7 +63,8 @@ def process(input_path: Path, output_path: Path,
                 else:
                     failed += 1
             except Exception as e:
-                logger.error(f'Unexpected error processing {mp4_file}: {e}')
+                tqdm.write(f'Unexpected error processing {mp4_file}: {e}')
+                failed += 1
 
     if failed > 0:
         logger.warning(f'Successfully processed {successful}/{len(mp4_files)}'
@@ -86,7 +87,10 @@ if __name__ == '__main__':
     parser.add_argument('--max-size-mb', '-m', type=int,
                         default=DEFAULT_MAX_SIZE_MB,
                         help='maximum file size to process (in MB)')
+    parser.add_argument('--max-workers', '-w', type=int, default=None,
+                        help='max worker processes (default: CPU count - 1)')
     args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
     successful, failed = process(Path(args.source), Path(args.destination),
-                                 args.max_size_mb, args.dry_run)
+                                 args.max_size_mb, args.dry_run,
+                                 args.max_workers)
