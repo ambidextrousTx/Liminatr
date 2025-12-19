@@ -13,11 +13,15 @@ def strip_audio(input_path: Path, output_path: Path) -> bool:
     Returns True if successful, False otherwise.
     """
     try:
-        (ffmpeg.input(input_path)
-         .output(str(output_path), vcodec='copy', an=None)
-         .run(quiet=True, overwrite_output=True))
+        cmd = build_ffmpeg_command(input_path, output_path)
+        cmd.run(quiet=True, overwrite_output=True)
         return True
     except ffmpeg.Error as e:
         stderr = e.stderr.decode()[:500]
         logger.error(f'FFmpeg error: {stderr} processing {input_path}')
         return False
+
+
+def build_ffmpeg_command(input_path, output_path):
+    return (ffmpeg.input(input_path)
+     .output(str(output_path), vcodec='copy', an=None))
