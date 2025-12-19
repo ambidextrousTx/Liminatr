@@ -9,3 +9,14 @@ dependencies = [
     "pycodestyle>=2.14.0",
     "tqdm>=4.67.1",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.1",
+]
+
+[tool.pytest.ini_options]
+minversion = "9.0"
+addopts = ["-ra", "-q"]
+testpaths = ["tests"]
+pythonpath = ["src"]
