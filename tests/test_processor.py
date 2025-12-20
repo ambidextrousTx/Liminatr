@@ -1,7 +1,8 @@
 from pathlib import Path
 import tempfile
+from unittest.mock import patch, MagicMock
 
-from processor import build_ffmpeg_command
+from processor import build_ffmpeg_command, strip_audio
 
 
 def test_build_ffmpeg_command():
@@ -15,3 +16,19 @@ def test_build_ffmpeg_command():
 
         assert cmd is not None
         # Could inspect cmd properties if needed
+
+
+@patch('processor.ffmpeg')
+def test_strip_audio_success(mock_ffmpeg):
+    """Test successful audio stripping"""
+    # Setup mock
+    mock_cmd = MagicMock()
+    mock_ffmpeg.input.return_value.output.return_value = mock_cmd
+
+    input_path = Path('/input/video.mp4')
+    output_path = Path('/output/video.mp4')
+
+    result = strip_audio(input_path, output_path)
+
+    assert result is True
+    mock_cmd.run.assert_called_once_with(quiet=True, overwrite_output=True)

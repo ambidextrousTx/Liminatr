@@ -24,4 +24,4 @@ def strip_audio(input_path: Path, output_path: Path) -> bool:
 
 def build_ffmpeg_command(input_path, output_path):
     return (ffmpeg.input(input_path)
-     .output(str(output_path), vcodec='copy', an=None))
+            .output(str(output_path), vcodec='copy', an=None))
